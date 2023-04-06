@@ -1,0 +1,100 @@
+diff --git a/driver/px4_device.c b/driver/px4_device.c
+index cfed72f..a546f59 100644
+--- a/driver/px4_device.c
++++ b/driver/px4_device.c
+@@ -1097,10 +1097,10 @@ static int px4_device_load_config(struct px4_device *px4,
+ 			"px4_device_load_config: it930x_read_reg(0x4979) failed. (ret: %d)\n",
+ 			ret);
+ 		return ret;
+-	} else if (!tmp) {
++	} /* else if (!tmp) {
+ 		dev_warn(dev, "EEPROM error.\n");
+ 		return ret;
+-	}
++	} */
+ 
+ 	chrdev_config[0].system_cap = PTX_ISDB_S_SYSTEM;
+ 	chrdev_config[1].system_cap = PTX_ISDB_S_SYSTEM;
+@@ -1180,7 +1180,8 @@ int px4_device_init(struct px4_device *px4, struct device *dev,
+ 	struct ptx_chrdev_group *chrdev_group;
+ 	struct px4_stream_context *stream_ctx;
+ 
+-	if (!px4 || !dev || !dev_serial || !chrdev_ctx || !quit_completion)
++	// if (!px4 || !dev || !dev_serial || !chrdev_ctx || !quit_completion)
++	if (!px4 || !dev  || !chrdev_ctx || !quit_completion)
+ 		return -EINVAL;
+ 
+ 	dev_dbg(dev,
+@@ -1206,6 +1207,7 @@ int px4_device_init(struct px4_device *px4, struct device *dev,
+ 		chrdev4->lnb_power = false;
+ 	}
+ 
++	/*
+ 	ret = px4_parse_serial_number(&px4->serial, dev_serial);
+ 	if (ret) {
+ 		dev_err(px4->dev,
+@@ -1222,6 +1224,7 @@ int px4_device_init(struct px4_device *px4, struct device *dev,
+ 		dev_warn(px4->dev,
+ 			 "px4_device_init: Unexpected device id: %u\n",
+ 			 px4->serial.dev_id);
++	*/
+ 
+ 	stream_ctx = kzalloc(sizeof(*stream_ctx), GFP_KERNEL);
+ 	if (!stream_ctx) {
+diff --git a/driver/px4_usb.c b/driver/px4_usb.c
+index 7290177..c019831 100644
+--- a/driver/px4_usb.c
++++ b/driver/px4_usb.c
+@@ -104,7 +104,7 @@ static int px4_usb_probe(struct usb_interface *intf,
+ 	init_completion(&ctx->quit_completion);
+ 
+ 	switch (id->idVendor) {
+-	case 0x0511:
++	case 0x048d:
+ 	{
+ 		bool px4_use_mldev = false;
+ 		enum pxmlt_model pxmlt5_model = PXMLT5PE_MODEL;
+@@ -271,18 +271,18 @@ static int px4_usb_resume(struct usb_interface *intf)
+ }
+ 
+ static const struct usb_device_id px4_usb_ids[] = {
+-	{ USB_DEVICE(0x0511, USB_PID_PX_W3U4) },
+-	{ USB_DEVICE(0x0511, USB_PID_PX_Q3U4) },
+-	{ USB_DEVICE(0x0511, USB_PID_PX_W3PE4) },
+-	{ USB_DEVICE(0x0511, USB_PID_PX_Q3PE4) },
+-	{ USB_DEVICE(0x0511, USB_PID_PX_W3PE5) },
+-	{ USB_DEVICE(0x0511, USB_PID_PX_Q3PE5) },
+-	{ USB_DEVICE(0x0511, USB_PID_PX_MLT5U) },
+-	{ USB_DEVICE(0x0511, USB_PID_PX_MLT5PE) },
+-	{ USB_DEVICE(0x0511, USB_PID_PX_MLT8PE3) },
+-	{ USB_DEVICE(0x0511, USB_PID_PX_MLT8PE5) },
+-	{ USB_DEVICE(0x0511, USB_PID_DIGIBEST_ISDB2056) },
+-	{ USB_DEVICE(0x0511, USB_PID_DIGIBEST_ISDB6014_4TS) },
++	{ USB_DEVICE(0x048d, USB_PID_PX_W3U4) },
++	{ USB_DEVICE(0x048d, USB_PID_PX_Q3U4) },
++	{ USB_DEVICE(0x048d, USB_PID_PX_W3PE4) },
++	{ USB_DEVICE(0x048d, USB_PID_PX_Q3PE4) },
++	{ USB_DEVICE(0x048d, USB_PID_PX_W3PE5) },
++	{ USB_DEVICE(0x048d, USB_PID_PX_Q3PE5) },
++	{ USB_DEVICE(0x048d, USB_PID_PX_MLT5U) },
++	{ USB_DEVICE(0x048d, USB_PID_PX_MLT5PE) },
++	{ USB_DEVICE(0x048d, USB_PID_PX_MLT8PE3) },
++	{ USB_DEVICE(0x048d, USB_PID_PX_MLT8PE5) },
++	{ USB_DEVICE(0x048d, USB_PID_DIGIBEST_ISDB2056) },
++	{ USB_DEVICE(0x048d, USB_PID_DIGIBEST_ISDB6014_4TS) },
+ 	{ 0 }
+ };
+ 
+diff --git a/driver/px4_usb.h b/driver/px4_usb.h
+index 73dde02..07b9ceb 100644
+--- a/driver/px4_usb.h
++++ b/driver/px4_usb.h
+@@ -8,7 +8,7 @@
+ #ifndef __PX4_USB_H__
+ #define __PX4_USB_H__
+ 
+-#define USB_PID_PX_W3U4			0x083f
++#define USB_PID_PX_W3U4			0x9306
+ #define USB_PID_PX_Q3U4			0x084a
+ #define USB_PID_PX_W3PE4		0x023f
+ #define USB_PID_PX_Q3PE4		0x024a
